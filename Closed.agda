@@ -42,9 +42,17 @@ module conn-sub (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) where
           (λ _ → refl)
           (λ _ → refl)
 
-  open Realign ϕ D public
+  module R = Realign ϕ D
+  open R hiding (elim; intro) public
 
-_[_⊢_]* = conn-sub.tp
+  elim : tp → A [ ϕ ⊢ a ]
+  elim x = unwrap (R.elim x)
 
-conn-sub-syntax = conn-sub.tp
+  intro : A [ ϕ ⊢ a ] → tp
+  intro x = R.intro (mk-wrap x)
+
+_[_⊢_]* : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → Set\ ϕ lzero
+A [ ϕ ⊢ a ]* = ⌊ conn-sub.tp A ϕ a ⌋
+
+conn-sub-syntax = _[_⊢_]*
 syntax conn-sub-syntax A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]*
