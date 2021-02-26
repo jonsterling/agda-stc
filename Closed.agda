@@ -29,6 +29,31 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
       */ind/β : (x : A) → ⌈ */ind (*/ret x) ⌉ ≡ ⌈ v x ⌉
       {-# REWRITE */ind/β #-}
 
+
 -- TODO
--- _⟦_⊢_⟧ : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → Set\ ϕ lzero
--- _⟦_⊢_⟧ = {!!}
+[conn-sub] : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → _
+[conn-sub] A ϕ a = realign ϕ ext-desc
+  where
+    ext-desc : desc lzero ϕ
+    ext-desc =
+      mk-desc (wrap (A [ ϕ ⊢ a ])) λ where
+      (ϕ = ⊤) →
+        Unit ,
+        mk-iso
+          (λ _ → mk-wrap ⌊ a ⋆ ⌋)
+          (λ _ → tt)
+          (λ _ → refl)
+          (λ _ → refl)
+
+conn-sub : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → Set\ ϕ lzero
+conn-sub A ϕ a = ⌊ ⌈ [conn-sub] A ϕ a ⌉ .fst ⌋
+
+_[_⊢_]* = conn-sub
+
+syntax conn-sub A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]*
+
+conn-sub/in : {A : Set} {ϕ : ℙ} {a : ϕ ⊢ A} → A [ ϕ ⊢ a ] → ⌈ A [ ϕ ⊢ a ]* ⌉
+conn-sub/in {A} {ϕ} {a} h = ⌈ [conn-sub] A ϕ a ⌉ .snd .bwd (mk-wrap h)
+
+conn-sub/out : {A : Set} {ϕ : ℙ} {a : ϕ ⊢ A} → ⌈ A [ ϕ ⊢ a ]* ⌉ → A [ ϕ ⊢ a ]
+conn-sub/out {A} {ϕ} {a} h = ⌈ [conn-sub] A ϕ a ⌉ .snd .fwd h .unwrap
