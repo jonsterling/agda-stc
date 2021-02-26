@@ -85,7 +85,7 @@ module _ (¶ : ℙ) where
   module [prod*] (A B : tp*.tp) where
     private
       D : desc _ ¶
-      desc.base D = Σ (tm* A) λ _ → tm* B
+      desc.base D = tm* A × tm* B
       desc.part D =
         λ where
         (¶ = ⊤) →
