@@ -132,20 +132,21 @@ module _ (¶ : ℙ) where
   no* : tm* ans*
   no* = mk-ans* _ (*/ret (mk-wrap ⟨no*⟩))
 
-  case*' : ∀ C (a : ⟨ans*⟩) (y : tm* C) (n : tm* C) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (⌈ [ans*] ⌉ .snd .bwd a) y n}) ]
-  case*' C (mk-⟨ans*⟩ syn sem) y n =
-    unwrap ⌈
-      */ind
-       (λ _ → wrap (tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]))
-       (λ {(¶ = ⊤) → mk-wrap ⌊ 𝓜 _ .case C (syn _) y n ⌋ })
-       (λ where
-        (mk-wrap ⟨yes*⟩) → ⌊ mk-wrap ⌊ y ⌋ ⌋
-        (mk-wrap ⟨no*⟩) → ⌊ mk-wrap ⌊ n ⌋ ⌋)
-       sem
-    ⌉
-
   case* : ∀ C (a : tm* ans*) (y : tm* C) (n : tm* C) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C a y n}) ]
-  case* C a y n = case*' C (⌈ [ans*] ⌉ .snd .fwd a) y n
+  case* C a y n = aux (⌈ [ans*] ⌉ .snd .fwd a)
+    where
+      aux : ∀ (a : ⟨ans*⟩) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (⌈ [ans*] ⌉ .snd .bwd a) y n}) ]
+      aux (mk-⟨ans*⟩ syn sem) =
+        unwrap ⌈
+          */ind
+           (λ _ → wrap (tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]))
+           (λ {(¶ = ⊤) → mk-wrap ⌊ 𝓜 _ .case C (syn _) y n ⌋ })
+           (λ where
+            (mk-wrap ⟨yes*⟩) → ⌊ mk-wrap ⌊ y ⌋ ⌋
+            (mk-wrap ⟨no*⟩) → ⌊ mk-wrap ⌊ n ⌋ ⌋)
+           sem
+        ⌉
+
 
   subtype-transport : ∀ {ℓ} {A : Set ℓ} {a b : ¶ ⊢ A} (p : z ∶ ¶ ⊩ (a z ≡ b z)) → A [ ¶ ⊢ a ] → A [ ¶ ⊢ b ]
   subtype-transport {ℓ} {A} p h = unwrap (coe (λ x → wrap (A [ ¶ ⊢ unwrap x ])) (⊢-ext p) (mk-wrap h))
