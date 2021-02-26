@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --rewriting #-}
+{-# OPTIONS --cubical --rewriting --with-K #-}
 
 module Gluing where
 

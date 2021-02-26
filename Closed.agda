@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --rewriting #-}
+{-# OPTIONS --cubical --rewriting --with-K #-}
 
 module Closed where
 
@@ -22,7 +22,7 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
   postulate
     */ret : A → ⌈ ϕ * A ⌉
 
-  module _ {B : ⌈ ϕ * A ⌉ → Set ℓ′} (u : ϕ ⊩ λ z → B (*/pt z)) (v : (x : A) → B (*/ret x) [ ϕ ⊢ (λ {(ϕ = ⊤) → u ⋆}) ]) where
+  module _ (B : ⌈ ϕ * A ⌉ → Set ℓ′) (u : ϕ ⊩ λ z → B (*/pt z)) (v : (x : A) → B (*/ret x) [ ϕ ⊢ (λ {(ϕ = ⊤) → u ⋆}) ]) where
     postulate
       */ind : (x : ⌈ ϕ * A ⌉) → B x [ ϕ ⊢ (λ {(ϕ = ⊤) → u ⋆}) ]
       */ind/β : (x : A) → ⌈ */ind (*/ret x) ⌉ ≡ ⌈ v x ⌉

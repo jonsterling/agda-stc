@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --rewriting --confluence-check #-}
+{-# OPTIONS --cubical --rewriting --confluence-check --with-K #-}
 
 module Prelude where
 
@@ -9,6 +9,13 @@ open import Agda.Primitive.Cubical public
 open import Agda.Builtin.Equality public
 open import Agda.Builtin.Equality.Rewrite public
 
+coe : {ℓ ℓ′ : _} {A : Set ℓ} (B : A → Set ℓ′) {a0 a1 : A} (p : a0 ≡ a1) → B a0 → B a1
+coe B refl x = x
+
+uip : {ℓ : _} {A : Set ℓ} {a0 a1 : A} (p q : a0 ≡ a1) → p ≡ q
+uip refl refl = refl
+
+
 record Unit {ℓ} : Set ℓ where
   constructor tt
 
@@ -18,8 +25,8 @@ _⊢_ = Partial
 _⊩_ = PartialP
 
 PartialP-syntax = PartialP
-
 syntax PartialP-syntax ϕ (λ z → A) = z ∶ ϕ ⊩ A
+
 
 
 open import Agda.Builtin.Cubical.Sub public
@@ -30,6 +37,21 @@ _[_⊢_] = Sub
 
 Sub-syntax = Sub
 syntax Sub-syntax A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]
+
+
+{-# NO_UNIVERSE_CHECK #-}
+record wrap {ℓ} (A : SSet ℓ) : Set ℓ where
+  constructor mk-wrap
+  field
+    unwrap : A
+
+open wrap public
+
+
+
+postulate
+  ⊢-ext : ∀ {ℓ} {ϕ} {A : Set ℓ} {p0 p1 : ϕ ⊢ A} → (z ∶ ϕ ⊩ (p0 z ≡ p1 z)) → mk-wrap p0 ≡ mk-wrap p1
+  ⊩-ext : ∀ {ℓ} {ϕ} {A : ϕ ⊢ Set ℓ} {p0 p1 : ϕ ⊩ A} → (z ∶ ϕ ⊩ _≡_ {A = A z} (p0 z) (p1 z)) → mk-wrap p0 ≡ mk-wrap p1
 
 
 
