@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type --cubical --rewriting --postfix-projections --with-K #-}
+{-# OPTIONS --cubical --rewriting --postfix-projections --with-K #-}
 
 module Example where
 
@@ -7,16 +7,18 @@ open import Closed
 open import Gluing
 open import Refine
 
-record connective {ℓ} {tp : Set ℓ} (tm : tp → Set ℓ) (A : Set ℓ) : Set ℓ where
+record connective {ℓ ℓ′} {tp : Set ℓ} (tm : tp → Set ℓ′) (A : Set ℓ′) : Set (ℓ ⊔ ℓ′) where
   constructor mk-connective
   field
     code : tp
     dec : tm code ≅ A
 
-record THEORY ℓ : Set (lsuc ℓ) where
+open connective
+
+record 𝕋 ℓ ℓ′ : Set (lsuc (ℓ ⊔ ℓ′)) where
   field
     tp : Set ℓ
-    tm : tp → Set ℓ
+    tm : tp → Set ℓ′
     sg : (A : tp) (B : tm A → tp) → connective tm (Σ[ x ∈ tm A ] tm (B x))
     pi : (A : tp) (B : tm A → tp) → connective tm ((x : tm A) → tm (B x))
     bool : tp
@@ -25,7 +27,8 @@ record THEORY ℓ : Set (lsuc ℓ) where
     case/tt : ∀ C (y n : tm C) → case C tt y n ≡ y
     case/ff : ∀ C (y n : tm C) → case C ff y n ≡ n
 
-open THEORY
+open 𝕋
+
 
 
 module _ (¶ : ℙ) where
@@ -33,7 +36,7 @@ module _ (¶ : ℙ) where
   ● : ∀ {ℓ} → Set ℓ → Set ℓ
   ● A = ⌈ ¶ * A ⌉
 
-  postulate 𝓜 : ¶ ⊢ THEORY lzero
+  postulate 𝓜 : ¶ ⊢ 𝕋 (lsuc lzero) lzero
 
   𝓜/case/tt : z ∶ ¶ ⊩ ∀ C (y n : 𝓜 z .tm C) → 𝓜 z .case C (𝓜 z .tt) y n ≡ y
   𝓜/case/tt z = 𝓜 z .case/tt
@@ -49,16 +52,15 @@ module _ (¶ : ℙ) where
     field
       syn : ¶ ⊩ λ z → 𝓜 z .tp
       ext : Set lzero [ z ∶ ¶ ⊢ tm (𝓜 z) (syn z) ]
-  open THEORY
 
   module tp* where
     private
-      D : desc _ ¶
+      D : desc (lsuc lzero) ¶
       desc.base D = ⟨tp*⟩
       desc.part D =
         λ where
         (¶ = ⊤) →
-          𝓜 _ .tp ,
+          𝓜 ⋆ .tp ,
           mk-iso
             (λ A → mk-tp*-data (λ _ → A) ⌊ 𝓜 ⋆ .tm A ⌋)
             (λ A → ⟨tp*⟩.syn A _)
@@ -133,10 +135,10 @@ module _ (¶ : ℙ) where
   correct-eq p q = subtype-trboolport (λ z → uip p (q z)) ⌊ p ⌋
 
 
-  𝓜* : THEORY _ [ ¶ ⊢ 𝓜 ]
+  𝓜* : 𝕋 _ _ [ ¶ ⊢ 𝓜 ]
   𝓜* = ⌊ M ⌋
     where
-      M : THEORY _
+      M : 𝕋 _ _
       M .tp = tp*.tp
       M .tm = tm*
       M .sg = sg*.conn

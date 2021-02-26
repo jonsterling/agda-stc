@@ -15,6 +15,9 @@ coe B refl x = x
 uip : {ℓ : _} {A : Set ℓ} {a0 a1 : A} (p q : a0 ≡ a1) → p ≡ q
 uip refl refl = refl
 
+cong : {ℓ ℓ′ : _} {A : Set ℓ} {B : Set ℓ′} {a0 a1 : A} (f : A → B) → a0 ≡ a1 → f a0 ≡ f a1
+cong f refl = refl
+
 
 record Unit {ℓ} : Set ℓ where
   constructor <>
