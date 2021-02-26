@@ -6,7 +6,7 @@ open import Prelude
 open import Closed
 open import Gluing
 
-module Refine (ϕ : ℙ) (A : ϕ ⊢ Set) (B : (ϕ ⊩ A) → Set\ ϕ lzero) where
+module Refine {ℓ} (ϕ : ℙ) (A : ϕ ⊢ Set ℓ) (B : (ϕ ⊩ A) → Set\ ϕ ℓ) where
   D : desc _ ϕ
   D =
     mk-desc

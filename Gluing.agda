@@ -29,3 +29,4 @@ module Realign {ℓ} (ϕ : ℙ) (D : desc ℓ ϕ) where
 
   eta : (x : tp) → bwd (snd (⌈ realign ⌉)) (fwd (snd (⌈ realign ⌉)) x) ≡ x
   eta = bwd-fwd (snd ⌈ realign ⌉)
+  {-# REWRITE eta #-}
