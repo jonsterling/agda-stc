@@ -5,6 +5,7 @@ module Example where
 open import Prelude
 open import Closed
 open import Gluing
+open import Refine
 
 record THEORY ℓ : Set (lsuc ℓ) where
   field
@@ -106,37 +107,26 @@ module _ (¶ : ℙ) where
       syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)
       sem : ● (wrap (⟨ans*⟩∋ syn))
 
-  ans*/desc : desc _ ¶
-  ans*/desc =
-    mk-desc ⟨ans*⟩ λ where
-    (¶ = ⊤) →
-      (𝓜 ⋆ .tm (𝓜 ⋆ .ans)) ,
-      mk-iso
-        (λ x → mk-⟨ans*⟩ (λ _ → x) tt)
-        (λ x → ⟨ans*⟩.syn x ⋆)
-        (λ x → refl)
-        (λ x → refl)
-
-  [ans*] : _
-  [ans*] = realign ¶ ans*/desc
-
   ans* : tp*
-  ans* = mk-tp* (λ z → 𝓜 z .ans) ⌊ ⌈ [ans*] ⌉ .fst ⌋
-
-  mk-ans* : (syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) → ● (wrap (⟨ans*⟩∋ syn)) → tm* ans*
-  mk-ans* syn sem = ⌈ [ans*] ⌉ .snd .bwd (mk-⟨ans*⟩ syn sem)
+  ans* =
+    mk-tp*
+     (λ z → 𝓜 z .ans)
+     ⌊ refine ¶
+         (λ z → 𝓜 z .tm (𝓜 z .ans))
+         (λ x → ¶ * wrap (⟨ans*⟩∋ x))
+     ⌋
 
   yes* : tm* ans*
-  yes* = mk-ans* _ (*/ret (mk-wrap ⟨yes*⟩))
+  yes* = ⟨ (λ z → 𝓜 z .yes) ◁ */ret (mk-wrap ⟨yes*⟩) ⟩
 
   no* : tm* ans*
-  no* = mk-ans* _ (*/ret (mk-wrap ⟨no*⟩))
+  no* = ⟨ (λ z → 𝓜 z .no) ◁ */ret (mk-wrap ⟨no*⟩) ⟩
 
   case* : ∀ C (a : tm* ans*) (y : tm* C) (n : tm* C) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C a y n}) ]
-  case* C a y n = aux (⌈ [ans*] ⌉ .snd .fwd a)
+  case* C a y n = aux (unrefine a) (refinement a)
     where
-      aux : ∀ (a : ⟨ans*⟩) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (⌈ [ans*] ⌉ .snd .bwd a) y n}) ]
-      aux (mk-⟨ans*⟩ syn sem) =
+      aux : (syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) (sem : ● (wrap (⟨ans*⟩∋ syn))) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]
+      aux syn sem =
         unwrap ⌈
           */ind
            (λ _ → wrap (tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]))
@@ -148,11 +138,13 @@ module _ (¶ : ℙ) where
         ⌉
 
 
+
   subtype-transport : ∀ {ℓ} {A : Set ℓ} {a b : ¶ ⊢ A} (p : z ∶ ¶ ⊩ (a z ≡ b z)) → A [ ¶ ⊢ a ] → A [ ¶ ⊢ b ]
   subtype-transport {ℓ} {A} p h = unwrap (coe (λ x → wrap (A [ ¶ ⊢ unwrap x ])) (⊢-ext p) (mk-wrap h))
 
   correct-eq : {A : Set} {a b : A} (p : a ≡ b) (q : ¶ ⊢ (a ≡ b)) → (a ≡ b) [ ¶ ⊢ q ]
   correct-eq p q = subtype-transport (λ z → uip p (q z)) ⌊ p ⌋
+
 
   𝓜* : THEORY _ [ ¶ ⊢ 𝓜 ]
   𝓜* = ⌊ M ⌋

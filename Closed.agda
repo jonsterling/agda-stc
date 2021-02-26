@@ -3,6 +3,7 @@
 module Closed where
 
 open import Prelude
+open import Gluing
 
 Set\ : (ϕ : ℙ) (ℓ : Level) → _
 Set\ ϕ ℓ = Set ℓ [ _ ∶ ϕ ⊢ Unit ]
@@ -27,3 +28,7 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
       */ind : (x : ⌈ ϕ * A ⌉) → B x [ ϕ ⊢ (λ {(ϕ = ⊤) → u ⋆}) ]
       */ind/β : (x : A) → ⌈ */ind (*/ret x) ⌉ ≡ ⌈ v x ⌉
       {-# REWRITE */ind/β #-}
+
+-- TODO
+-- _⟦_⊢_⟧ : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → Set\ ϕ lzero
+-- _⟦_⊢_⟧ = {!!}
