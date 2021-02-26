@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --rewriting --confluence-check #-}
+{-# OPTIONS --cubical --rewriting #-}
 
 module Gluing where
 

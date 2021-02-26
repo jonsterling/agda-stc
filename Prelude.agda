@@ -9,10 +9,17 @@ open import Agda.Primitive.Cubical public
 open import Agda.Builtin.Equality public
 open import Agda.Builtin.Equality.Rewrite public
 
+record Unit {ℓ} : Set ℓ where
+  constructor tt
+
 infix 10 _⊢_
 infix 10 _⊩_
 _⊢_ = Partial
 _⊩_ = PartialP
+
+PartialP-syntax = PartialP
+
+syntax PartialP-syntax ϕ (λ z → A) = z ∶ ϕ ⊩ A
 
 
 open import Agda.Builtin.Cubical.Sub public
