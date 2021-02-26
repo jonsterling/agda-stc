@@ -1,72 +1,10 @@
 {-# OPTIONS --type-in-type --cubical --rewriting --confluence-check #-}
 
-module stc-playground where
+module Example where
 
-open import Cubical.Foundations.Prelude
-open import Agda.Builtin.Equality renaming (_≡_ to _≣_)
-open import Agda.Builtin.Equality.Rewrite
-open import Agda.Primitive
-
-
-module _ {ℓ} where
-  postulate
-    _*_ : ∀ (ϕ : I) (A : Type ℓ) → Type ℓ
-
-  module _ {ϕ : I} {A : Type ℓ} where
-    postulate
-      */pt : Partial ϕ (ϕ * A)
-      [*/ret] : A → ϕ * A [ ϕ ↦ */pt ]
-
-    */ret : A → ϕ * A
-    */ret a = outS ([*/ret] a)
-
-    postulate
-      */glue
-        : (B : _*_ ϕ A → Type ℓ)
-        → (u : PartialP ϕ (λ z → B (*/pt z)))
-        → (v : (x : A) → B (*/ret x) [ ϕ ↦ (λ {(ϕ = i1) → u _}) ])
-        → (x : ϕ * A)
-        → B x
-
-      */glue/β
-        : (B : _*_ ϕ A → Type ℓ)
-        → (u : PartialP ϕ (λ z → B (*/pt z)))
-        → (v : (x : A) → B (*/ret x) [ ϕ ↦ (λ {(ϕ = i1) → u _}) ])
-        → (x : A)
-        → */glue B u v (*/ret x) ≣ outS (v x)
-      {-# REWRITE */glue/β #-}
-
-
-record iso {ℓ} (A B : Type ℓ) : Type ℓ where
-  constructor mk-iso
-  field
-    fwd : A → B
-    bwd : B → A
-    fwd-bwd : ∀ x → (fwd (bwd x)) ≣ x
-    bwd-fwd : ∀ x → (bwd (fwd x)) ≣ x
-
-isom : ∀ {ℓ} (B : Type ℓ) → Type (ℓ-suc ℓ)
-isom {ℓ} B = Σ (Type ℓ) λ A → iso A B
-
-{-# NO_UNIVERSE_CHECK #-}
-record desc ℓ (ϕ : I) : Type (ℓ-suc ℓ) where
-  constructor mk-desc
-  field
-    base : Type ℓ
-    part : Partial ϕ (isom base)
-
-postulate
-  realign : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → isom (desc.base D) [ ϕ ↦ desc.part D ]
-
-  realign/fwd-bwd : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) (x : _) → iso.fwd (snd (outS (realign ϕ D))) (iso.bwd (snd (outS (realign ϕ D))) x) ≣ x
-  realign/bwd-fwd : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) (x : fst (outS (realign ϕ D))) → iso.bwd (snd (outS (realign ϕ D))) (iso.fwd (snd (outS (realign ϕ D))) x) ≣ x
-  {-# REWRITE realign/fwd-bwd #-}
-
-[realign/tp] : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → Type ℓ [ ϕ ↦ (λ z → fst (desc.part D z)) ]
-[realign/tp] ϕ D = inS (fst (outS (realign ϕ D)))
-
-realign/tp : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → Type ℓ
-realign/tp ϕ D = fst (outS (realign ϕ D))
+open import Prelude
+open import Closed
+open import Gluing
 
 
 record THEORY ℓ : Type (ℓ-suc ℓ) where
