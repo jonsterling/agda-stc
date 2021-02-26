@@ -6,30 +6,28 @@ open import Prelude
 open import Closed
 open import Gluing
 
-module _ (ϕ : ℙ) (A : ϕ ⊢ Set) (B : (ϕ ⊩ A) → Set\ ϕ lzero) where
-  [refine] : _
-  [refine] =
-    realign ϕ
-      (mk-desc
-       (Σ (wrap (ϕ ⊩ A)) λ x → ⌈ B (unwrap x) ⌉)
-       λ where
-       (ϕ = ⊤) →
-         A ⋆ ,
-         mk-iso
-           (λ x → (mk-wrap (λ _ → x)) , tt)
-           (λ x → x .fst .unwrap ⋆)
-           (λ x → refl)
-           λ x → refl)
+module Refine (ϕ : ℙ) (A : ϕ ⊢ Set) (B : (ϕ ⊩ A) → Set\ ϕ lzero) where
+  D : desc _ ϕ
+  D =
+    mk-desc
+    (Σ (wrap (ϕ ⊩ A)) λ x → ⌈ B (unwrap x) ⌉)
+    λ where
+    (ϕ = ⊤) →
+      A ⋆ ,
+      mk-iso
+        (λ x → (mk-wrap (λ _ → x)) , tt)
+        (λ x → x .fst .unwrap ⋆)
+        (λ x → refl)
+        (λ x → refl)
 
+  module Realignment = Realign ϕ D
+  open Realignment public hiding (intro)
 
-  refine : Set
-  refine = fst ⌈ [refine] ⌉
+  intro : (x : ϕ ⊩ A) → ⌈ B x ⌉ → tp
+  intro x y = Realignment.intro ((mk-wrap x) , y)
 
-⟨_◁_⟩ : ∀ {ϕ} {A} {B : ϕ ⊩ A → Set\ ϕ lzero} → (x : ϕ ⊩ A) → ⌈ B x ⌉ → refine ϕ A B
-⟨ x ◁ y ⟩ = ⌈ [refine] _ _ _ ⌉ .snd .bwd (mk-wrap x , y)
+  unrefine : tp → ϕ ⊩ A
+  unrefine x = Realignment.elim x .fst .unwrap
 
-unrefine : ∀ {ϕ} {A} {B : ϕ ⊩ A → Set\ ϕ lzero} → refine ϕ A B → ϕ ⊩ A
-unrefine x = ⌈ [refine] _ _ _ ⌉ .snd .fwd x .fst .unwrap
-
-refinement : ∀ {ϕ} {A} {B : ϕ ⊩ A → Set\ ϕ lzero} (x : refine ϕ A B) → ⌈ B (unrefine x) ⌉
-refinement x = ⌈ [refine] _ _ _ ⌉ .snd .fwd x .snd
+  refinement : (x : tp) → ⌈ B (unrefine x) ⌉
+  refinement x = Realignment.elim x .snd

@@ -60,70 +60,66 @@ module _ (¶ : ℙ) where
 
   open THEORY
 
+  module tp* where
+    private
+      D : desc _ ¶
+      desc.base D = ⟨tp*⟩
+      desc.part D =
+        λ where
+        (¶ = ⊤) →
+          𝓜 _ .tp ,
+          mk-iso
+            (λ A → mk-tp*-data (λ _ → A) ⌊ 𝓜 ⋆ .tm A ⌋)
+            (λ A → syn A _)
+            (λ A → refl)
+            (λ A → refl)
 
-  [tp*] : isom (desc.base tp*/desc)
-  [tp*] = ⌈ realign ¶ tp*/desc ⌉
+    open Realign ¶ tp*/desc public
 
-  tp* = [tp*] .fst
-  tp*/iso = [tp*] .snd
+  tm* : tp*.tp → Set _
+  tm* A = ⌈ tp*.elim A .⟨tp*⟩.ext ⌉
 
-  tm* : tp* → Set _
-  tm* A* = ⌈ tp*/iso .fwd A* .⟨tp*⟩.ext ⌉
+  mk-tp* : (syn : ¶ ⊩ λ z → 𝓜 z .tp) → Set lzero [ z ∶ ¶ ⊢ 𝓜 z .tm (syn z) ] → tp*.tp
+  mk-tp* syn ext = tp*.intro (mk-tp*-data syn ext)
 
-  mk-tp* : (syn : ¶ ⊩ λ z → 𝓜 z .tp) → Set lzero [ z ∶ ¶ ⊢ 𝓜 z .tm (syn z) ] → tp*
-  mk-tp* syn ext = tp*/iso .bwd (mk-tp*-data syn ext)
+  module [prod*] (A B : tp*.tp) where
+    private
+      D : desc _ ¶
+      desc.base D = Σ (tm* A) λ _ → tm* B
+      desc.part D =
+        λ where
+        (¶ = ⊤) →
+          𝓜 _ .tm (𝓜 _ .prod A B) ,
+          𝓜 _ .prod/tm A B
+    open Realign ¶ D public
 
-  prod*/desc : (A* B* : tp*) → desc _ ¶
-  prod*/desc A* B* =
-    mk-desc
-      (Σ (tm* A*) λ _ → tm* B*)
-      λ where
-      (¶ = ⊤) →
-        𝓜 _ .tm (𝓜 _ .prod A* B*) ,
-        𝓜 _ .prod/tm A* B*
-
-  [prod*] : (A B : tp*) → _
-  [prod*] A B = realign ¶ (prod*/desc A B)
-
-  prod* : tp* → tp* → tp*
+  prod* : tp*.tp → tp*.tp → tp*.tp
   prod* A B =
     mk-tp*
      (λ {(¶ = ⊤) → 𝓜 _ .prod A B})
-     ⌊ fst ⌈ [prod*] A B ⌉ ⌋
+     ⌊ [prod*].tp A B ⌋
 
-  prod/tm* : (A B : tp*) → tm* (prod* A B) ≅ tm* A × tm* B
-  prod/tm* A B = snd ⌈ [prod*] A B ⌉
-
+  prod/tm* : (A B : tp*.tp) → tm* (prod* A B) ≅ tm* A × tm* B
+  prod/tm* A B = [prod*].rules A B
 
   {-# NO_UNIVERSE_CHECK #-}
   data ⟨ans*⟩∋_ : (z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) → SSet lzero where
     ⟨yes*⟩ : ⟨ans*⟩∋ λ z → 𝓜 z .yes
     ⟨no*⟩ : ⟨ans*⟩∋ λ z → 𝓜 z .no
 
-  {-# NO_UNIVERSE_CHECK #-}
-  record ⟨ans*⟩ : Set lzero where
-    constructor mk-⟨ans*⟩
-    field
-      syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)
-      sem : ● (wrap (⟨ans*⟩∋ syn))
+  module [ans*] = Refine.Refine ¶ (λ z → 𝓜 z .tm (𝓜 z .ans)) (λ a → ¶ * wrap (⟨ans*⟩∋ a))
 
-  ans* : tp*
-  ans* =
-    mk-tp*
-     (λ z → 𝓜 z .ans)
-     ⌊ refine ¶
-         (λ z → 𝓜 z .tm (𝓜 z .ans))
-         (λ x → ¶ * wrap (⟨ans*⟩∋ x))
-     ⌋
+  ans* : tp*.tp
+  ans* = mk-tp* (λ z → 𝓜 z .ans) ⌊ [ans*].tp ⌋
 
   yes* : tm* ans*
-  yes* = ⟨ (λ z → 𝓜 z .yes) ◁ */ret (mk-wrap ⟨yes*⟩) ⟩
+  yes* = [ans*].intro (λ z → 𝓜 z .yes) (*/ret (mk-wrap ⟨yes*⟩))
 
   no* : tm* ans*
-  no* = ⟨ (λ z → 𝓜 z .no) ◁ */ret (mk-wrap ⟨no*⟩) ⟩
+  no* = [ans*].intro (λ z → 𝓜 z .no) (*/ret (mk-wrap ⟨no*⟩))
 
   case* : ∀ C (a : tm* ans*) (y : tm* C) (n : tm* C) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C a y n}) ]
-  case* C a y n = aux (unrefine a) (refinement a)
+  case* C a y n = aux ([ans*].unrefine a) ([ans*].refinement a)
     where
       aux : (syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) (sem : ● (wrap (⟨ans*⟩∋ syn))) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]
       aux syn sem =
@@ -137,8 +133,6 @@ module _ (¶ : ℙ) where
            sem
         ⌉
 
-
-
   subtype-transport : ∀ {ℓ} {A : Set ℓ} {a b : ¶ ⊢ A} (p : z ∶ ¶ ⊩ (a z ≡ b z)) → A [ ¶ ⊢ a ] → A [ ¶ ⊢ b ]
   subtype-transport {ℓ} {A} p h = unwrap (coe (λ x → wrap (A [ ¶ ⊢ unwrap x ])) (⊢-ext p) (mk-wrap h))
 
@@ -150,7 +144,7 @@ module _ (¶ : ℙ) where
   𝓜* = ⌊ M ⌋
     where
       M : THEORY _
-      M .tp = tp*
+      M .tp = tp*.tp
       M .tm = tm*
       M .prod = prod*
       M .prod/tm = prod/tm*

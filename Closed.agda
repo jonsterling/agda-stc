@@ -29,13 +29,10 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
       */ind/β : (x : A) → ⌈ */ind (*/ret x) ⌉ ≡ ⌈ v x ⌉
       {-# REWRITE */ind/β #-}
 
-
--- TODO
-[conn-sub] : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → _
-[conn-sub] A ϕ a = realign ϕ ext-desc
-  where
-    ext-desc : desc lzero ϕ
-    ext-desc =
+module conn-sub (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) where
+  private
+    D : desc lzero ϕ
+    D =
       mk-desc (wrap (A [ ϕ ⊢ a ])) λ where
       (ϕ = ⊤) →
         Unit ,
@@ -45,15 +42,9 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
           (λ _ → refl)
           (λ _ → refl)
 
-conn-sub : (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) → Set\ ϕ lzero
-conn-sub A ϕ a = ⌊ ⌈ [conn-sub] A ϕ a ⌉ .fst ⌋
+  open Realign ϕ D public
 
-_[_⊢_]* = conn-sub
+_[_⊢_]* = conn-sub.tp
 
-syntax conn-sub A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]*
-
-conn-sub/in : {A : Set} {ϕ : ℙ} {a : ϕ ⊢ A} → A [ ϕ ⊢ a ] → ⌈ A [ ϕ ⊢ a ]* ⌉
-conn-sub/in {A} {ϕ} {a} h = ⌈ [conn-sub] A ϕ a ⌉ .snd .bwd (mk-wrap h)
-
-conn-sub/out : {A : Set} {ϕ : ℙ} {a : ϕ ⊢ A} → ⌈ A [ ϕ ⊢ a ]* ⌉ → A [ ϕ ⊢ a ]
-conn-sub/out {A} {ϕ} {a} h = ⌈ [conn-sub] A ϕ a ⌉ .snd .fwd h .unwrap
+conn-sub-syntax = conn-sub.tp
+syntax conn-sub-syntax A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]*
