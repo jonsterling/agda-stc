@@ -128,11 +128,11 @@ module _ (¶ : ℙ) where
            sem
         ⌉
 
-  subtype-transport : ∀ {ℓ} {A : Set ℓ} {a b : ¶ ⊢ A} (p : z ∶ ¶ ⊩ (a z ≡ b z)) → A [ ¶ ⊢ a ] → A [ ¶ ⊢ b ]
-  subtype-transport {ℓ} {A} p h = unwrap (coe (λ x → wrap (A [ ¶ ⊢ unwrap x ])) (⊢-ext p) (mk-wrap h))
+  replace-boundary : ∀ {ℓ} {A : Set ℓ} {a b : ¶ ⊢ A} (p : z ∶ ¶ ⊩ (a z ≡ b z)) → A [ ¶ ⊢ a ] → A [ ¶ ⊢ b ]
+  replace-boundary {ℓ} {A} p h = unwrap (coe (λ x → wrap (A [ ¶ ⊢ unwrap x ])) (⊢-ext p) (mk-wrap h))
 
   correct-eq : {A : Set} {a b : A} (p : a ≡ b) (q : ¶ ⊢ (a ≡ b)) → (a ≡ b) [ ¶ ⊢ q ]
-  correct-eq p q = subtype-transport (λ z → uip p (q z)) ⌊ p ⌋
+  correct-eq p q = replace-boundary (λ z → uip p (q z)) ⌊ p ⌋
 
 
   𝓜* : 𝕋 _ _ [ ¶ ⊢ 𝓜 ]
