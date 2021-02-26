@@ -15,7 +15,7 @@ module Refine (ϕ : ℙ) (A : ϕ ⊢ Set) (B : (ϕ ⊩ A) → Set\ ϕ lzero) whe
     (ϕ = ⊤) →
       A ⋆ ,
       mk-iso
-        (λ x → (mk-wrap (λ _ → x)) , tt)
+        (λ x → (mk-wrap (λ _ → x)) , <>)
         (λ x → x .fst .unwrap ⋆)
         (λ x → refl)
         (λ x → refl)

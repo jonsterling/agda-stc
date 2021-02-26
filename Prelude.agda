@@ -17,7 +17,7 @@ uip refl refl = refl
 
 
 record Unit {ℓ} : Set ℓ where
-  constructor tt
+  constructor <>
 
 infix 10 _⊢_
 infix 10 _⊩_

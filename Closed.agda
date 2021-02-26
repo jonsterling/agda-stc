@@ -18,7 +18,7 @@ postulate
 
 module _ {ϕ : ℙ} {A : Set ℓ} where
   */pt : ϕ ⊢ ⌈ ϕ * A ⌉
-  */pt = λ {(ϕ = ⊤) → tt}
+  */pt = λ {(ϕ = ⊤) → <>}
 
   postulate
     */ret : A → ⌈ ϕ * A ⌉
@@ -38,7 +38,7 @@ module conn-sub (A : Set) (ϕ : ℙ) (a : ϕ ⊢ A) where
         Unit ,
         mk-iso
           (λ _ → mk-wrap ⌊ a ⋆ ⌋)
-          (λ _ → tt)
+          (λ _ → <>)
           (λ _ → refl)
           (λ _ → refl)
 
