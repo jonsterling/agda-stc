@@ -1,6 +1,7 @@
 {-# OPTIONS --type-in-type --cubical --rewriting --confluence-check --postfix-projections #-}
 
 module Example where
+
 open import Prelude
 open import Closed
 open import Gluing
@@ -55,9 +56,9 @@ module _ (¶ : ℙ) where
   tp* = fst ⌈ [tp*] ⌉
 
   tm* : tp* → Set _
-  tm* A* = ⌈ tp*-data.ext (iso.fwd (snd ⌈ [tp*] ⌉) A*) ⌉
+  tm* A* = ⌈ tp*-data.ext (fwd (snd ⌈ [tp*] ⌉) A*) ⌉
 
-  mk-tp* = iso.bwd (snd ⌈ [tp*] ⌉)
+  mk-tp* = bwd (snd ⌈ [tp*] ⌉)
 
   prod*/desc : (A* B* : tp*) → desc _ ¶
   prod*/desc A* B* =
@@ -82,10 +83,10 @@ module _ (¶ : ℙ) where
   prod/tm* A B = snd ⌈ [prod*] A B ⌉
 
   𝓜* : THEORY _ [ ¶ ⊢ 𝓜 ]
-  𝓜* =
-   ⌊ record
-    { tp = tp* ;
-      tm = tm* ;
-      prod = prod* ;
-      prod/tm = prod/tm* }
-   ⌋
+  𝓜* = ⌊ M ⌋
+    where
+      M : THEORY _
+      M .tp = tp*
+      M .tm = tm*
+      M .prod = prod*
+      M .prod/tm = prod/tm*
