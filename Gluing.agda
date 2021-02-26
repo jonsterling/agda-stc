@@ -15,13 +15,13 @@ record desc ℓ (ϕ : ℙ) : Set (lsuc ℓ) where
 module _ {ℓ} (ϕ : ℙ) (D : desc ℓ ϕ) where
 
   postulate
-    realign : isom (desc.base D) [ ϕ ↦ desc.part D ]
+    realign : isom (desc.base D) [ ϕ ⊢ desc.part D ]
 
     realign/fwd-bwd : (x : _) → iso.fwd (snd ⌈ realign ⌉) (iso.bwd (snd ⌈ realign ⌉) x) ≣ x
     realign/bwd-fwd : (x : fst (⌈ realign ⌉)) → iso.bwd (snd (⌈ realign ⌉)) (iso.fwd (snd (⌈ realign ⌉)) x) ≣ x
     {-# REWRITE realign/fwd-bwd #-}
 
-  [realign/tp] : Set ℓ [ ϕ ↦ (λ z → fst (desc.part D z)) ]
+  [realign/tp] : Set ℓ [ z ∶ ϕ ⊢ fst (desc.part D z) ]
   [realign/tp] = ⌊ fst ⌈ realign ⌉ ⌋
 
   realign/tp : Set ℓ

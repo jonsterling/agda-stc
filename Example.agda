@@ -30,7 +30,7 @@ module _ (¶ : ℙ) where
     constructor mk-tp*-data
     field
       syn : ¶ ⊩ λ z → tp (M z)
-      ext : Set lzero [ ¶ ↦ (λ z → tm (M z) (syn z)) ]
+      ext : Set lzero [ z ∶ ¶ ⊢ tm (M z) (syn z) ]
 
   open tp*-data
 
@@ -41,7 +41,7 @@ module _ (¶ : ℙ) where
     (¶ = ⊤) →
       tp (M _) ,
       mk-iso
-        (λ A → mk-tp*-data (λ _ → A) ⌊ (tm (M ⋆) A) ⌋)
+        (λ A → mk-tp*-data (λ _ → A) ⌊ tm (M ⋆) A ⌋)
         (λ A → syn A _)
         (λ A → refl)
         (λ A → refl)
@@ -49,7 +49,7 @@ module _ (¶ : ℙ) where
   open THEORY
 
 
-  [tp*] : isom (desc.base tp*/desc) [ ¶ ↦ desc.part tp*/desc ]
+  [tp*] : isom (desc.base tp*/desc) [ ¶ ⊢ desc.part tp*/desc ]
   [tp*] = realign ¶ tp*/desc
 
   tp* : Set _
@@ -69,7 +69,7 @@ module _ (¶ : ℙ) where
         tm (M _) (prod (M _) A* B*) ,
         prod/tm (M _) A* B*
 
-  [prod*] : (A B : tp*) → isom (desc.base (prod*/desc A B)) [ ¶ ↦ desc.part (prod*/desc A B) ]
+  [prod*] : (A B : tp*) → isom (desc.base (prod*/desc A B)) [ ¶ ⊢ desc.part (prod*/desc A B) ]
   [prod*] A B = realign ¶ (prod*/desc A B)
 
   prod* : tp* → tp* → tp*
@@ -82,7 +82,7 @@ module _ (¶ : ℙ) where
   prod/tm* : (A B : tp*) → iso (tm* (prod* A B)) (Σ (tm* A) (λ _ → tm* B))
   prod/tm* A B = snd ⌈ [prod*] A B ⌉
 
-  M* : THEORY _ [ ¶ ↦ M ]
+  M* : THEORY _ [ ¶ ⊢ M ]
   M* =
    ⌊ record
     { tp = tp* ;

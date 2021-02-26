@@ -16,8 +16,11 @@ _⊩_ = PartialP
 open import Agda.Builtin.Cubical.Sub public
   renaming (inc to ⌊_⌋; primSubOut to ⌈_⌉)
 
-infix 4 _[_↦_]
-_[_↦_] = Sub
+infix 4 _[_⊢_]
+_[_⊢_] = Sub
+
+Sub-syntax = Sub
+syntax Sub-syntax A ϕ (λ z → a) = A [ z ∶ ϕ ⊢ a ]
 
 
 
