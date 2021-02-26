@@ -94,10 +94,7 @@ module _ (¶ : ℙ) where
     open Realign ¶ D public
 
   prod* : tp*.tp → tp*.tp → tp*.tp
-  prod* A B =
-    mk-tp*
-     (λ {(¶ = ⊤) → 𝓜 _ .prod A B})
-     ⌊ [prod*].tp A B ⌋
+  prod* A B = mk-tp* (λ {(¶ = ⊤) → 𝓜 _ .prod A B}) ⌊ [prod*].tp A B ⌋
 
   prod/tm* : (A B : tp*.tp) → tm* (prod* A B) ≅ tm* A × tm* B
   prod/tm* A B = [prod*].rules A B
