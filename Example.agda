@@ -1,11 +1,9 @@
 {-# OPTIONS --type-in-type --cubical --rewriting --confluence-check #-}
 
 module Example where
-
 open import Prelude
 open import Closed
 open import Gluing
-
 
 record THEORY ℓ : Type (ℓ-suc ℓ) where
   field
@@ -14,6 +12,7 @@ record THEORY ℓ : Type (ℓ-suc ℓ) where
     prod : tp → tp → tp
     prod/tm : ∀ A B → iso {ℓ} (tm (prod A B)) (Σ (tm A) (λ _ → tm B))
 open THEORY
+
 
 module _ (¶ : I) where
 
@@ -25,6 +24,7 @@ module _ (¶ : I) where
 
   [○] : ∀ {ℓ} → ○ (Type ℓ) → SSet ℓ
   [○] A = PartialP ¶ A
+
 
   module _ .(_ : IsOne ¶) where
     postulate

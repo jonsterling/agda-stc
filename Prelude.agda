@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type --cubical --rewriting --confluence-check #-}
+{-# OPTIONS --cubical --rewriting --confluence-check #-}
 
 module Prelude where
 

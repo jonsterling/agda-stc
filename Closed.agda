@@ -1,13 +1,17 @@
-{-# OPTIONS --type-in-type --cubical --rewriting --confluence-check #-}
+{-# OPTIONS --cubical --rewriting --confluence-check #-}
 
 module Closed where
 
 open import Prelude
 
-postulate
-  _*_ : ∀ (ϕ : I) (A : Type) → Type
+private
+  variable
+    ℓ ℓ′ : Level
 
-module _ {ϕ : I} {A : Type} where
+postulate
+  _*_ : ∀ (ϕ : I) (A : Type ℓ) → Type ℓ
+
+module _ {ϕ : I} {A : Type ℓ} where
   postulate
     */pt : Partial ϕ (ϕ * A)
     [*/ret] : A → ϕ * A [ ϕ ↦ */pt ]
@@ -15,18 +19,8 @@ module _ {ϕ : I} {A : Type} where
   */ret : A → ϕ * A
   */ret a = outS ([*/ret] a)
 
-  postulate
-    */glue
-      : (B : _*_ ϕ A → Type)
-      → (u : PartialP ϕ (λ z → B (*/pt z)))
-      → (v : (x : A) → B (*/ret x) [ ϕ ↦ (λ {(ϕ = i1) → u _}) ])
-      → (x : ϕ * A)
-      → B x
-
-    */glue/β
-      : (B : _*_ ϕ A → Type)
-      → (u : PartialP ϕ (λ z → B (*/pt z)))
-      → (v : (x : A) → B (*/ret x) [ ϕ ↦ (λ {(ϕ = i1) → u _}) ])
-      → (x : A)
-      → */glue B u v (*/ret x) ≣ outS (v x)
-    {-# REWRITE */glue/β #-}
+  module _ (B : ϕ * A → Type ℓ′) (u : PartialP ϕ (λ z → B (*/pt z))) (v : (x : A) → B (*/ret x) [ ϕ ↦ (λ {(ϕ = i1) → u _}) ]) where
+    postulate
+      */glue : (x : ϕ * A) → B x
+      */glue/β : (x : A) → */glue (*/ret x) ≣ outS (v x)
+      {-# REWRITE */glue/β #-}
