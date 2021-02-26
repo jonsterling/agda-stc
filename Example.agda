@@ -75,7 +75,7 @@ module _ (¶ : ℙ) where
   prod* A B =
     mk-tp*
     (mk-tp*-data
-     (λ {(¶ = ⊤)→ 𝓜 _ .prod A B})
+     (λ {(¶ = ⊤) → 𝓜 _ .prod A B})
      ⌊ fst ⌈ [prod*] A B ⌉ ⌋)
 
   prod/tm* : (A B : tp*) → iso (tm* (prod* A B)) (Σ (tm* A) (λ _ → tm* B))
