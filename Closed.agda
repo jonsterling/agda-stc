@@ -22,5 +22,5 @@ module _ {ϕ : ℙ} {A : Set ℓ} where
   module _ (B : ϕ * A → Set ℓ′) (u : PartialP ϕ (λ z → B (*/pt z))) (v : (x : A) → B (*/ret x) [ ϕ ⊢ (λ {(ϕ = ⊤) → u _}) ]) where
     postulate
       */glue : (x : ϕ * A) → B x
-      */glue/β : (x : A) → */glue (*/ret x) ≣ ⌈ v x ⌉
+      */glue/β : (x : A) → */glue (*/ret x) ≡ ⌈ v x ⌉
       {-# REWRITE */glue/β #-}

@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type --cubical --rewriting --confluence-check #-}
+{-# OPTIONS --type-in-type --cubical --rewriting --confluence-check --postfix-projections #-}
 
 module Example where
 open import Prelude
@@ -22,15 +22,14 @@ module _ (¶ : ℙ) where
 
   module _ .(_ : IsOne ¶) where
     postulate
-      M : THEORY lzero
-
+      𝓜 : THEORY lzero
 
   {-# NO_UNIVERSE_CHECK #-}
   record tp*-data : Set (lsuc lzero) where
     constructor mk-tp*-data
     field
-      syn : ¶ ⊩ λ z → tp (M z)
-      ext : Set lzero [ z ∶ ¶ ⊢ tm (M z) (syn z) ]
+      syn : ¶ ⊩ λ z → 𝓜 z .tp
+      ext : Set lzero [ z ∶ ¶ ⊢ tm (𝓜 z) (syn z) ]
 
   open tp*-data
 
@@ -39,9 +38,9 @@ module _ (¶ : ℙ) where
   desc.part tp*/desc =
     λ where
     (¶ = ⊤) →
-      tp (M _) ,
+      𝓜 _ .tp ,
       mk-iso
-        (λ A → mk-tp*-data (λ _ → A) ⌊ tm (M ⋆) A ⌋)
+        (λ A → mk-tp*-data (λ _ → A) ⌊ 𝓜 ⋆ .tm A ⌋)
         (λ A → syn A _)
         (λ A → refl)
         (λ A → refl)
@@ -66,8 +65,8 @@ module _ (¶ : ℙ) where
       (Σ (tm* A*) λ _ → tm* B*)
       λ where
       (¶ = ⊤) →
-        tm (M _) (prod (M _) A* B*) ,
-        prod/tm (M _) A* B*
+        𝓜 _ .tm (𝓜 _ .prod A* B*) ,
+        𝓜 _ .prod/tm A* B*
 
   [prod*] : (A B : tp*) → isom (desc.base (prod*/desc A B)) [ ¶ ⊢ desc.part (prod*/desc A B) ]
   [prod*] A B = realign ¶ (prod*/desc A B)
@@ -76,14 +75,14 @@ module _ (¶ : ℙ) where
   prod* A B =
     mk-tp*
     (mk-tp*-data
-     (λ {(¶ = ⊤)→ prod (M _) A B})
-     ⌊ (fst (⌈ [prod*] A B ⌉)) ⌋)
+     (λ {(¶ = ⊤)→ 𝓜 _ .prod A B})
+     ⌊ fst ⌈ [prod*] A B ⌉ ⌋)
 
   prod/tm* : (A B : tp*) → iso (tm* (prod* A B)) (Σ (tm* A) (λ _ → tm* B))
   prod/tm* A B = snd ⌈ [prod*] A B ⌉
 
-  M* : THEORY _ [ ¶ ⊢ M ]
-  M* =
+  𝓜* : THEORY _ [ ¶ ⊢ 𝓜 ]
+  𝓜* =
    ⌊ record
     { tp = tp* ;
       tm = tm* ;
