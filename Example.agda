@@ -137,7 +137,7 @@ module _ (¶ : ℙ) where
     unwrap ⌈
       */ind
        (λ _ → wrap (tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]))
-       (λ {(¶ = ⊤) → mk-wrap ⌊ (𝓜 _ .case C (syn _) y n) ⌋ })
+       (λ {(¶ = ⊤) → mk-wrap ⌊ 𝓜 _ .case C (syn _) y n ⌋ })
        (λ where
         (mk-wrap ⟨yes*⟩) → ⌊ mk-wrap ⌊ y ⌋ ⌋
         (mk-wrap ⟨no*⟩) → ⌊ mk-wrap ⌊ n ⌋ ⌋)
