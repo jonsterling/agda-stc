@@ -104,32 +104,39 @@ module _ (¶ : ℙ) where
 
   module [ans*] where
     {-# NO_UNIVERSE_CHECK #-}
-    data val : (z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) → SSet lzero where
-      yes* : val λ z → 𝓜 z .yes
-      no* : val λ z → 𝓜 z .no
-    open Refine.Refine ¶ (λ z → 𝓜 z .tm (𝓜 z .ans)) (λ a → ¶ * wrap (val a)) public
+    data val' : (z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) → SSet lzero where
+      yes' : val' λ z → 𝓜 z .yes
+      no' : val' λ z → 𝓜 z .no
+
+    val : _ → Set
+    val = λ a → wrap (val' a)
+
+    pattern yes* = mk-wrap yes'
+    pattern no* = mk-wrap no'
+
+    open Refine.Refine ¶ (λ z → 𝓜 z .tm (𝓜 z .ans)) (λ a → ¶ * val a) public
 
   ans* : tp*.tp
   ans* = mk-tp* (λ z → 𝓜 z .ans) ⌊ [ans*].tp ⌋
 
   yes* : tm* ans*
-  yes* = [ans*].intro (λ z → 𝓜 z .yes) (*/ret (mk-wrap [ans*].yes*))
+  yes* = [ans*].intro (λ z → 𝓜 z .yes) (*/ret [ans*].yes*)
 
   no* : tm* ans*
-  no* = [ans*].intro (λ z → 𝓜 z .no) (*/ret (mk-wrap [ans*].no*))
+  no* = [ans*].intro (λ z → 𝓜 z .no) (*/ret [ans*].no*)
 
   case* : ∀ C (a : tm* ans*) (y : tm* C) (n : tm* C) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C a y n}) ]
   case* C a y n = aux ([ans*].unrefine a) ([ans*].refinement a)
     where
-      aux : (syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) (sem : ● (wrap ([ans*].val syn))) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]
+      aux : (syn : z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) (sem : ● ([ans*].val syn)) → tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]
       aux syn sem =
         unwrap ⌈
           */ind
            (λ _ → wrap (tm* C [ ¶ ⊢ (λ {(¶ = ⊤) → 𝓜 ⋆ .case C (syn ⋆) y n}) ]))
            (λ {(¶ = ⊤) → mk-wrap ⌊ 𝓜 _ .case C (syn _) y n ⌋ })
            (λ where
-            (mk-wrap [ans*].yes*) → ⌊ mk-wrap ⌊ y ⌋ ⌋
-            (mk-wrap [ans*].no*) → ⌊ mk-wrap ⌊ n ⌋ ⌋)
+            [ans*].yes* → ⌊ mk-wrap ⌊ y ⌋ ⌋
+            [ans*].no* → ⌊ mk-wrap ⌊ n ⌋ ⌋)
            sem
         ⌉
 
