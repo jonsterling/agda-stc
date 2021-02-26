@@ -4,22 +4,25 @@ module Gluing where
 
 open import Prelude
 
+
 {-# NO_UNIVERSE_CHECK #-}
-record desc ℓ (ϕ : I) : Type (ℓ-suc ℓ) where
+record desc ℓ (ϕ : ℙ) : Set (lsuc ℓ) where
   constructor mk-desc
   field
-    base : Type ℓ
+    base : Set ℓ
     part : Partial ϕ (isom base)
 
-postulate
-  realign : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → isom (desc.base D) [ ϕ ↦ desc.part D ]
+module _ {ℓ} (ϕ : ℙ) (D : desc ℓ ϕ) where
 
-  realign/fwd-bwd : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) (x : _) → iso.fwd (snd (outS (realign ϕ D))) (iso.bwd (snd (outS (realign ϕ D))) x) ≣ x
-  realign/bwd-fwd : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) (x : fst (outS (realign ϕ D))) → iso.bwd (snd (outS (realign ϕ D))) (iso.fwd (snd (outS (realign ϕ D))) x) ≣ x
-  {-# REWRITE realign/fwd-bwd #-}
+  postulate
+    realign : isom (desc.base D) [ ϕ ↦ desc.part D ]
 
-[realign/tp] : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → Type ℓ [ ϕ ↦ (λ z → fst (desc.part D z)) ]
-[realign/tp] ϕ D = inS (fst (outS (realign ϕ D)))
+    realign/fwd-bwd : (x : _) → iso.fwd (snd ⌈ realign ⌉) (iso.bwd (snd ⌈ realign ⌉) x) ≣ x
+    realign/bwd-fwd : (x : fst (⌈ realign ⌉)) → iso.bwd (snd (⌈ realign ⌉)) (iso.fwd (snd (⌈ realign ⌉)) x) ≣ x
+    {-# REWRITE realign/fwd-bwd #-}
 
-realign/tp : ∀ {ℓ} (ϕ : I) (D : desc ℓ ϕ) → Type ℓ
-realign/tp ϕ D = fst (outS (realign ϕ D))
+  [realign/tp] : Set ℓ [ ϕ ↦ (λ z → fst (desc.part D z)) ]
+  [realign/tp] = ⌊ fst ⌈ realign ⌉ ⌋
+
+  realign/tp : Set ℓ
+  realign/tp = fst ⌈ realign ⌉

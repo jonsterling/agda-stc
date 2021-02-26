@@ -2,12 +2,33 @@
 
 module Prelude where
 
-open import Cubical.Foundations.Prelude hiding (refl) public
+open import Agda.Primitive public
+open import Agda.Builtin.Sigma public
+open import Agda.Primitive.Cubical public
+  renaming (I to ℙ; i0 to ⊥; i1 to ⊤; itIsOne to ⋆)
+
+infix 10 _⊢_
+infix 10 _⊩_
+_⊢_ = Partial
+_⊩_ = PartialP
+
+
+open import Agda.Builtin.Cubical.Sub public
+  renaming (inc to ⌊_⌋; primSubOut to ⌈_⌉)
+
+infix 4 _[_↦_]
+_[_↦_] = Sub
+
+
+
+
+
+-- open import Cubical.Foundations.Prelude hiding (refl) public
 open import Agda.Builtin.Equality renaming (_≡_ to _≣_) public
 open import Agda.Builtin.Equality.Rewrite public
 open import Agda.Primitive using (SSet) public
 
-record iso {ℓ} (A B : Type ℓ) : Type ℓ where
+record iso {ℓ} (A B : Set ℓ) : Set ℓ where
   constructor mk-iso
   field
     fwd : A → B
@@ -15,5 +36,5 @@ record iso {ℓ} (A B : Type ℓ) : Type ℓ where
     fwd-bwd : ∀ x → (fwd (bwd x)) ≣ x
     bwd-fwd : ∀ x → (bwd (fwd x)) ≣ x
 
-isom : ∀ {ℓ} (B : Type ℓ) → Type (ℓ-suc ℓ)
-isom {ℓ} B = Σ (Type ℓ) λ A → iso A B
+isom : ∀ {ℓ} (B : Set ℓ) → Set (lsuc ℓ)
+isom {ℓ} B = Σ (Set ℓ) λ A → iso A B

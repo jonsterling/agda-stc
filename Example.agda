@@ -5,52 +5,46 @@ open import Prelude
 open import Closed
 open import Gluing
 
-record THEORY ℓ : Type (ℓ-suc ℓ) where
+record THEORY ℓ : Set (lsuc ℓ) where
   field
-    tp : Type ℓ
-    tm : tp → Type ℓ
+    tp : Set ℓ
+    tm : tp → Set ℓ
     prod : tp → tp → tp
     prod/tm : ∀ A B → iso {ℓ} (tm (prod A B)) (Σ (tm A) (λ _ → tm B))
+
 open THEORY
 
 
-module _ (¶ : I) where
+module _ (¶ : ℙ) where
 
-  ○ : ∀ {ℓ} → Type ℓ → SSet ℓ
-  ○ A = .(_ : IsOne ¶) → A
-
-  ● : ∀ {ℓ} → Type ℓ → Type ℓ
+  ● : ∀ {ℓ} → Set ℓ → Set ℓ
   ● A = ¶ * A
-
-  [○] : ∀ {ℓ} → ○ (Type ℓ) → SSet ℓ
-  [○] A = PartialP ¶ A
-
 
   module _ .(_ : IsOne ¶) where
     postulate
-      M : THEORY ℓ-zero
+      M : THEORY lzero
 
 
   {-# NO_UNIVERSE_CHECK #-}
-  record tp*-data : Type (ℓ-suc ℓ-zero) where
+  record tp*-data : Set (lsuc lzero) where
     constructor mk-tp*-data
     field
-      syn : [○] (λ z → tp (M z))
-      ext : Type ℓ-zero [ ¶ ↦ (λ z → tm (M z) (syn z)) ]
+      syn : ¶ ⊩ λ z → tp (M z)
+      ext : Set lzero [ ¶ ↦ (λ z → tm (M z) (syn z)) ]
 
   open tp*-data
 
-  tp*/desc : desc (ℓ-suc ℓ-zero) ¶
+  tp*/desc : desc _ ¶
   desc.base tp*/desc = tp*-data
   desc.part tp*/desc =
     λ where
-    (¶ = i1) →
+    (¶ = ⊤) →
       tp (M _) ,
       mk-iso
-        (λ A → mk-tp*-data (λ _ → A) (inS (tm (M 1=1) A)))
+        (λ A → mk-tp*-data (λ _ → A) ⌊ (tm (M ⋆) A) ⌋)
         (λ A → syn A _)
-        (λ A → _≣_.refl)
-        (λ A → _≣_.refl)
+        (λ A → refl)
+        (λ A → refl)
 
   open THEORY
 
@@ -58,20 +52,20 @@ module _ (¶ : I) where
   [tp*] : isom (desc.base tp*/desc) [ ¶ ↦ desc.part tp*/desc ]
   [tp*] = realign ¶ tp*/desc
 
-  tp* : Type (ℓ-suc ℓ-zero)
-  tp* = fst (outS [tp*])
+  tp* : Set _
+  tp* = fst ⌈ [tp*] ⌉
 
-  tm* : tp* → Type _
-  tm* A* = outS (tp*-data.ext (iso.fwd (snd (outS [tp*])) A*))
+  tm* : tp* → Set _
+  tm* A* = ⌈ tp*-data.ext (iso.fwd (snd ⌈ [tp*] ⌉) A*) ⌉
 
-  mk-tp* = iso.bwd (snd (outS [tp*]))
+  mk-tp* = iso.bwd (snd ⌈ [tp*] ⌉)
 
-  prod*/desc : (A* B* : tp*) → desc ℓ-zero ¶
+  prod*/desc : (A* B* : tp*) → desc _ ¶
   prod*/desc A* B* =
     mk-desc
       (Σ (tm* A*) λ _ → tm* B*)
       λ where
-      (¶ = i1) →
+      (¶ = ⊤) →
         tm (M _) (prod (M _) A* B*) ,
         prod/tm (M _) A* B*
 
@@ -82,16 +76,17 @@ module _ (¶ : I) where
   prod* A B =
     mk-tp*
     (mk-tp*-data
-     (λ {(¶ = i1)→ prod (M _) A B})
-     (inS (fst (outS ([prod*] A B)))))
+     (λ {(¶ = ⊤)→ prod (M _) A B})
+     ⌊ (fst (⌈ [prod*] A B ⌉)) ⌋)
 
   prod/tm* : (A B : tp*) → iso (tm* (prod* A B)) (Σ (tm* A) (λ _ → tm* B))
-  prod/tm* A B = snd (outS ([prod*] A B))
+  prod/tm* A B = snd ⌈ [prod*] A B ⌉
 
-  M* : THEORY (ℓ-suc ℓ-zero) [ ¶ ↦ M ]
+  M* : THEORY _ [ ¶ ↦ M ]
   M* =
-   inS record
+   ⌊ record
     { tp = tp* ;
       tm = tm* ;
       prod = prod* ;
       prod/tm = prod/tm* }
+   ⌋
