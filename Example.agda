@@ -103,7 +103,6 @@ module _ (¶ : ℙ) where
   prod/tm* A B = [prod*].rules A B
 
   module [ans*] where
-    {-# NO_UNIVERSE_CHECK #-}
     data val' : (z ∶ ¶ ⊩ 𝓜 z .tm (𝓜 z .ans)) → SSet lzero where
       yes' : val' λ z → 𝓜 z .yes
       no' : val' λ z → 𝓜 z .no
